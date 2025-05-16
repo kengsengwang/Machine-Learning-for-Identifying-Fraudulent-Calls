@@ -1,2 +1,10 @@
-Machine-Learning-for-Identifying-Fraudulent-Calls-1/
-Machine-Learning-for-Identifying-Fraudulent-Calls/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.db
+.DS_Store
+.idea/
+.vscode/
+*.log

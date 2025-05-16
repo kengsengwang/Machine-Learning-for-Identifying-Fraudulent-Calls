@@ -1,0 +1,4 @@
+git add requirements.txt
+git commit -m "Add requirements.txt for package management"
+git push -u origin main
+pip freeze > requirements.txt
