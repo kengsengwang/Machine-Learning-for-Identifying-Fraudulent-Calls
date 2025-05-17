@@ -1,0 +1,77 @@
+import os
+import subprocess
+import sys
+
+def check_repo_sync(repo_path):
+    try:
+        # Check if the directory is a git repository
+        if not os.path.exists(os.path.join(repo_path, ".git")):
+            print("\nNot a valid Git repository. Please initialize a git repository.")
+            return
+        
+        # Navigate to the repository
+        os.chdir(repo_path)
+
+        # Fetch latest updates
+        print("\nFetching latest updates from the remote repository...")
+        subprocess.run(["git", "fetch"], check=True)
+
+        # Check for local changes
+        print("\nChecking for local changes...")
+        local_changes = subprocess.run(["git", "status", "--porcelain"], capture_output=True, text=True)
+        if local_changes.stdout.strip():
+            print("\nLocal changes detected:")
+            print(local_changes.stdout)
+
+            # Prompt user to commit changes
+            commit_message = input("\nDo you want to commit and push these changes? (yes/no): ").strip().lower()
+            if commit_message == "yes":
+                commit_msg = input("Enter a commit message: ").strip()
+                subprocess.run(["git", "add", "."], check=True)
+                subprocess.run(["git", "commit", "-m", commit_msg], check=True)
+                subprocess.run(["git", "push"], check=True)
+                print("\nChanges committed and pushed successfully.")
+            else:
+                print("\nLocal changes were not committed.")
+        else:
+            print("\nNo local changes detected.")
+
+        # Check if the local branch is behind the remote branch
+        print("\nChecking if the local branch is behind the remote branch...")
+        status = subprocess.run(["git", "status", "-uno"], capture_output=True, text=True)
+        if "behind" in status.stdout:
+            print("\nYour local branch is behind the remote branch. Run 'git pull' to sync.")
+            pull_sync = input("Do you want to pull the latest changes? (yes/no): ").strip().lower()
+            if pull_sync == "yes":
+                subprocess.run(["git", "pull"], check=True)
+                print("\nLocal branch synced with the remote branch.")
+            else:
+                print("\nLocal branch not synced.")
+        else:
+            print("\nYour local branch is up to date with the remote branch.")
+
+        # Check for untracked files
+        print("\nChecking for untracked files...")
+        untracked_files = subprocess.run(["git", "ls-files", "--others", "--exclude-standard"], capture_output=True, text=True)
+        if untracked_files.stdout.strip():
+            print("\nUntracked files found:")
+            print(untracked_files.stdout)
+            add_untracked = input("\nDo you want to add and push these untracked files? (yes/no): ").strip().lower()
+            if add_untracked == "yes":
+                subprocess.run(["git", "add", "."], check=True)
+                commit_msg = input("Enter a commit message for the untracked files: ").strip()
+                subprocess.run(["git", "commit", "-m", commit_msg], check=True)
+                subprocess.run(["git", "push"], check=True)
+                print("\nUntracked files committed and pushed successfully.")
+            else:
+                print("\nUntracked files were not added.")
+        else:
+            print("\nNo untracked files found.")
+
+    except Exception as e:
+        print(f"\nAn error occurred: {e}")
+
+if __name__ == "__main__":
+    # Update the repo_path to the current workspace directory
+    repo_path = "/workspaces/Machine-Learning-for-Identifying-Fraudulent-Calls"
+    check_repo_sync(repo_path)
