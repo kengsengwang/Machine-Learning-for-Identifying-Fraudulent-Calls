@@ -20,26 +20,30 @@ def get_commit_message():
     for i, commit_type in enumerate(COMMIT_TYPES, 1):
         print(f"{i}. {commit_type}")
 
-    commit_type_choice = input("\nEnter the number corresponding to your commit type: ").strip()
-    
-    try:
-        commit_type = COMMIT_TYPES[int(commit_type_choice) - 1].split()[0]
-    except (IndexError, ValueError):
-        print("\nInvalid choice. Please try again.")
-        return get_commit_message()
+    while True:
+        try:
+            commit_type_choice = int(input("\nEnter the number corresponding to your commit type: ").strip())
+            if commit_type_choice < 1 or commit_type_choice > len(COMMIT_TYPES):
+                raise ValueError("Invalid number")
+            
+            commit_type = COMMIT_TYPES[commit_type_choice - 1].split()[0]
+            break
+        except ValueError:
+            print("\nInvalid choice. Please enter a number between 1 and 11.")
 
     scope = input("\nEnter the scope (e.g., 'scripts', 'project', 'readme', 'structure', 'sync'): ").strip()
     description = input("\nEnter a short description of the changes: ").strip()
-    
+
     # Format the final commit message
     commit_message = f"{commit_type}({scope}): {description}"
-    print(f"\nGenerated commit message: {commit_message}")
+    print(f"\nGenerated commit message: **{commit_message}**")
+    
+    # Confirm the final commit message
     confirm = input("\nDo you want to use this commit message? (yes/no): ").strip().lower()
-
     if confirm == "yes":
         return commit_message
     else:
-        print("\nAborting commit message selection. Please try again.")
+        print("\nCommit message discarded. Please try again.")
         return get_commit_message()
 
 def check_repo_sync(repo_path):
