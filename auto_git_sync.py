@@ -1,6 +1,46 @@
 import os
 import subprocess
-import sys
+
+COMMIT_TYPES = [
+    "feat (Adding a new feature)",
+    "fix (Fixing a bug)",
+    "docs (Documentation changes)",
+    "style (Code style changes)",
+    "refactor (Code restructuring without changing functionality)",
+    "test (Adding or modifying tests)",
+    "chore (Routine tasks like package updates)",
+    "build (Changes to the build system or dependencies)",
+    "ci (Continuous integration changes)",
+    "perf (Performance improvements)",
+    "revert (Reverting a previous commit)"
+]
+
+def get_commit_message():
+    print("\nSelect a commit type:")
+    for i, commit_type in enumerate(COMMIT_TYPES, 1):
+        print(f"{i}. {commit_type}")
+
+    commit_type_choice = input("\nEnter the number corresponding to your commit type: ").strip()
+    
+    try:
+        commit_type = COMMIT_TYPES[int(commit_type_choice) - 1].split()[0]
+    except (IndexError, ValueError):
+        print("\nInvalid choice. Please try again.")
+        return get_commit_message()
+
+    scope = input("\nEnter the scope (e.g., 'scripts', 'project', 'readme', 'structure', 'sync'): ").strip()
+    description = input("\nEnter a short description of the changes: ").strip()
+    
+    # Format the final commit message
+    commit_message = f"{commit_type}({scope}): {description}"
+    print(f"\nGenerated commit message: {commit_message}")
+    confirm = input("\nDo you want to use this commit message? (yes/no): ").strip().lower()
+
+    if confirm == "yes":
+        return commit_message
+    else:
+        print("\nAborting commit message selection. Please try again.")
+        return get_commit_message()
 
 def check_repo_sync(repo_path):
     try:
@@ -24,11 +64,11 @@ def check_repo_sync(repo_path):
             print(local_changes.stdout)
 
             # Prompt user to commit changes
-            commit_message = input("\nDo you want to commit and push these changes? (yes/no): ").strip().lower()
-            if commit_message == "yes":
-                commit_msg = input("Enter a commit message: ").strip()
+            commit = input("\nDo you want to commit and push these changes? (yes/no): ").strip().lower()
+            if commit == "yes":
+                commit_message = get_commit_message()
                 subprocess.run(["git", "add", "."], check=True)
-                subprocess.run(["git", "commit", "-m", commit_msg], check=True)
+                subprocess.run(["git", "commit", "-m", commit_message], check=True)
                 subprocess.run(["git", "push"], check=True)
                 print("\nChanges committed and pushed successfully.")
             else:
@@ -58,9 +98,9 @@ def check_repo_sync(repo_path):
             print(untracked_files.stdout)
             add_untracked = input("\nDo you want to add and push these untracked files? (yes/no): ").strip().lower()
             if add_untracked == "yes":
+                commit_message = get_commit_message()
                 subprocess.run(["git", "add", "."], check=True)
-                commit_msg = input("Enter a commit message for the untracked files: ").strip()
-                subprocess.run(["git", "commit", "-m", commit_msg], check=True)
+                subprocess.run(["git", "commit", "-m", commit_message], check=True)
                 subprocess.run(["git", "push"], check=True)
                 print("\nUntracked files committed and pushed successfully.")
             else:
