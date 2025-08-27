@@ -26,19 +26,16 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-pip-
 
-    - name: Install deps
+    - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
+        python -m pip install --upgrade pip setuptools wheel
         pip install -r requirements.txt
+        pip install pytest flake8
 
-    - name: Smoke test
+    - name: Lint
       run: |
-        python - <<'PY'
-        import sys
-        print("Python:", sys.version)
-        try:
-            import pandas, sklearn
-            print("Imported pandas", pandas.__version__, "sklearn", sklearn.__version__)
-        except Exception as e:
-            raise SystemExit("Import check failed: " + str(e))
-        PY
+        flake8 .
+
+    - name: Tests
+      run: |
+        pytest -q
