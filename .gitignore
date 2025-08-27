@@ -18,3 +18,8 @@ venv/
 myenv/
 .venv/
 venv/
+
+.venv/
+venv/
+myenv/
+archive_*/
