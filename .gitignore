@@ -14,3 +14,7 @@ artifacts/
 models/
 reports/
 venv/
+
+myenv/
+.venv/
+venv/
